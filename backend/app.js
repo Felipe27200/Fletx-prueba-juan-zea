@@ -1,9 +1,13 @@
 const express = require('express')
 const app = express()
 const verifyJWT = require('./middleware/verifyJWT');
+const cookieParser = require('cookie-parser');
+
 require('dotenv').config();
 
 app.use(express.json());
+//middleware for cookies
+app.use(cookieParser());
 
 const authRoutes = require('./route/AuthRoute')
 
@@ -11,6 +15,10 @@ const authRoutes = require('./route/AuthRoute')
 app.use("/api/auth", authRoutes);
 
 app.use(verifyJWT);
+
+app.get('/ok', (req, res) => {
+  res.send('Hello World!')
+})
 
 // Error Handler
 app.use((err, req, res, next) => {

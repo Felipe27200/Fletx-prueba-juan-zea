@@ -73,6 +73,17 @@ exports.findByUsername = async function (username) {
     return userResponse(user[0]);
 }
 
+exports.findByRefreshToken = async function (refreshToken) {
+    let user = await userModel.findOne({
+        where: { refresh_token: refreshToken }
+    });
+
+    if (!user)
+        return null;
+
+    return userResponse(user);
+}
+
 function userResponse(user) {
     return {
         username: user.username,
