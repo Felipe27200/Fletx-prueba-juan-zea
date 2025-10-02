@@ -1,13 +1,32 @@
 const express = require('express')
 const app = express()
-const port = 3000
+require('dotenv').config();
 
-const database = require("./database/database")
+app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+const authRoutes = require('./route/AuthRoute')
 
+// ROUTES
+app.use("/api/auth", authRoutes)
+
+// Error Handler
+app.use((err, req, res, next) => {
+  if (err) 
+  { 
+   
+    res.status(400)
+      .json({ 
+        error: err,
+        message: err.message
+      });
+  }
+  else
+  {
+    next();
+  }
+});
+
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
