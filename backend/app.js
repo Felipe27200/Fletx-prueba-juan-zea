@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+const verifyJWT = require('./middleware/verifyJWT');
 require('dotenv').config();
 
 app.use(express.json());
@@ -7,7 +8,9 @@ app.use(express.json());
 const authRoutes = require('./route/AuthRoute')
 
 // ROUTES
-app.use("/api/auth", authRoutes)
+app.use("/api/auth", authRoutes);
+
+app.use(verifyJWT);
 
 // Error Handler
 app.use((err, req, res, next) => {
