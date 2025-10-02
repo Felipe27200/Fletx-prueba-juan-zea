@@ -1,5 +1,6 @@
 const userModel = require('../model/User');
 const bcrypt = require('bcrypt')
+const JWT = require('jsonwebtoken')
 
 exports.register = async function (userDTO) {
     let checkDuplicateUser = await module.exports.findByUsername(userDTO.username);
@@ -7,8 +8,7 @@ exports.register = async function (userDTO) {
     if (checkDuplicateUser != null)
         throw new Error("The username is already taken.");
 
-    const salt = 10;
-    const hashedPassword = await bcrypt.hash(userDTO.password, salt);
+    const hashedPassword = await encryptPassword(userDTO.password);
 
     let user = await userModel.create({
         name: userDTO.name,
@@ -19,9 +19,52 @@ exports.register = async function (userDTO) {
     return userResponse(user);
 };
 
+exports.login = async function (username, password) {
+    // Find user by username
+    const user = await userModel.findOne({ where: { username } });
+
+    if (!user) {
+        throw new Error("Username or password incorrect!");
+    }
+
+    // Compare plain password with stored hash
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+        throw new Error("Username or password incorrect!");
+    }
+
+    // CREATE JWT
+    const accessToken = JWT.sign(
+        { "username": user.username },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: '30s' }
+    );
+
+    const refreshToken = JWT.sign(
+        { "username": user.username },
+        process.env.REFRESH_TOKEN_SECRET,
+        { expiresIn: '1d' }
+    );
+
+    // Saving refresh token
+    await userModel.update(
+        { refresh_token: refreshToken }, 
+        { where: { id: user.id } });
+
+    return refreshToken;
+};
+
+async function encryptPassword(password) {
+    const salt = 10;
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    return hashedPassword;
+}
+
 exports.findByUsername = async function (username) {
     let user = await userModel.findAll({
-        where: { username: username}
+        where: { username: username }
     });
 
     if (user.length <= 0)
@@ -30,8 +73,7 @@ exports.findByUsername = async function (username) {
     return userResponse(user[0]);
 }
 
-function userResponse(user)
-{
+function userResponse(user) {
     return {
         username: user.username,
         name: user.name,
