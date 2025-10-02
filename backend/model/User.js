@@ -1,4 +1,4 @@
-const sequelize = require("./database/database");
+const sequelize = require("../database/database");
 const { DataTypes } = require('sequelize');
 
 const User = sequelize.define(
@@ -10,7 +10,7 @@ const User = sequelize.define(
       autoIncrement: true
     },
     // Model attributes are defined here
-    first_Name: {
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -33,3 +33,5 @@ const User = sequelize.define(
     timestamps: false,
   },
 );
+
+module.exports = User;
