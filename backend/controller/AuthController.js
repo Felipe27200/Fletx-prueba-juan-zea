@@ -39,7 +39,13 @@ exports.login = async function (req, res) {
 
         let tokens = await authService.login(req.body.username, req.body.password);
 
-        res.cookie('jwt', tokens.refreshToken, { httpOnly: true, sameSite: 'None', secure:true, maxAge: 25 * 60 * 60 * 1000 });
+        res.cookie('jwt', tokens.refreshToken, { 
+            httpOnly: true, 
+            sameSite: 'Lax', 
+            secure: false, 
+            maxAge: 25 * 60 * 60 * 1000 
+        });
+
         res.json(responseObjet("User login", tokens.accessToken));
     }
     catch(error)
@@ -51,6 +57,8 @@ exports.login = async function (req, res) {
 
 exports.handleRefreshToken = async (req, res) => {
     const cookies = req.cookies;
+
+    console.log(cookies);
 
     if (!cookies?.jwt) 
         return res.sendStatus(401);
@@ -70,8 +78,6 @@ exports.handleRefreshToken = async (req, res) => {
             console.log(decoded.username, foundUser.username);
             if (err || foundUser.username !== decoded.username) 
                 return res.sendStatus(403);
-
-            console.dir(foundUser)
 
             const accessToken = jwt.sign(
                 { "username": decoded.username },
@@ -94,7 +100,13 @@ exports.logout = async (req, res) => {
 
     authService.logout(refreshToken);
 
-    res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
+    res.clearCookie('jwt', { 
+        httpOnly: true, 
+        // sameSite: 'None', 
+        // secure: true 
+        sameSite: 'Lax', 
+        secure: false, 
+    });
     res.sendStatus(204);
 }
 

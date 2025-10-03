@@ -3,6 +3,8 @@ const app = express()
 const verifyJWT = require('./middleware/verifyJWT');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const corsOptions = require('./config/corsOptions')
+// const credentials = require('./middleware/credentials')
 
 require('dotenv').config();
 
@@ -10,12 +12,8 @@ app.use(express.json());
 //middleware for cookies
 app.use(cookieParser());
 
-app.use(cors({
-  origin: process.env.CORS_ORIGIN,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
+// app.use(credentials);
+app.use(cors(corsOptions));
 
 const authRoutes = require('./route/AuthRoute')
 const productRoutes = require('./route/ProductRoute')
