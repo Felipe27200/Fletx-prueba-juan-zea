@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink} from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
@@ -9,27 +9,29 @@ import { ActivatedRoute} from '@angular/router';
 import { MessageModule } from 'primeng/message';
 
 import { AuthService } from '../services/auth.service';
+import { CreateUser } from '../interfaces/CreateUser';
 
-import { Login } from '../interfaces/Login';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-sign-up',
   imports: [
     ReactiveFormsModule,
-    RouterLink,
     CardModule,
     ButtonModule,
     MessageModule,
+    RouterLink
   ],
-  templateUrl: './login.component.html',
-  styleUrl: './login.css'
+  templateUrl: './sign-up.html',
+  styleUrl: './sign-up.css'
 })
-export class LoginComponent {
+export class SignUp {
   private route: ActivatedRoute = inject(ActivatedRoute)
+  private router: Router = inject(Router)
   private fb: FormBuilder = inject(FormBuilder)
   private authService: AuthService = inject(AuthService)
 
   loginForm = this.fb.group({
+    name: ['', Validators.required],
     username: ['', Validators.required],
     password: ['', Validators.required],
   });
@@ -55,27 +57,34 @@ export class LoginComponent {
     if (!this.loginForm.valid)
       return;
 
+    if (this.name.value === undefined || this.name.value === null)
+    {
+      this.errors.push('The name field does not be empty');
+      return;
+    }
     if (this.username.value === undefined || this.username.value === null)
     {
       this.errors.push('The username field does not be empty');
       return;
     }
-
     if (this.password.value === undefined || this.password.value === null)
     {
       this.errors.push('The username field does not be empty');
       return;
     }
 
-    let formData: Login = {
+    let formData: CreateUser = {
+      name: this.name.value,
       username: this.username.value,
       password: this.password.value,
     };
 
-    this.authService.login(formData)
+    this.authService.signUp(formData)
       .subscribe({
         next: (response) => {
-          this.authService.setAccessToken(response.data)
+          this.router.navigate(["/login"], {
+            queryParams: { message: "User was created." }
+          });
         },
         error: (e) => {
           if (e.error.hasOwnProperty("errors"))
@@ -86,6 +95,7 @@ export class LoginComponent {
       });
   }
 
+  get name() { return this.loginForm.controls.name }
   get username() { return this.loginForm.controls.username }
   get password() { return this.loginForm.controls.password }
 }

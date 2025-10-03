@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ErrorHandlerService } from './error-handler.service';
 import { Login } from '../interfaces/Login';
 import { catchError } from 'rxjs';
+import { CreateUser } from '../interfaces/CreateUser';
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +25,16 @@ export class AuthService {
   login(formData: Login)
   {
     let url = `${this.baseUrl}/login`;
+
+    return this.http.post<any>(url, formData, this.httpOptions)
+      .pipe(
+        catchError(this.errorHandler.handleError)
+      );
+  }
+
+  signUp(formData: CreateUser)
+  {
+    let url = `${this.baseUrl}/register`;
 
     return this.http.post<any>(url, formData, this.httpOptions)
       .pipe(
