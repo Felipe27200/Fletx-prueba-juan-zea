@@ -51,4 +51,13 @@ export class ProductService {
         catchError(this.errorHandler.handleError)
       );
   }
+
+  deleteById(id: number) {
+    let url = `${this.baseUrl}/${+id}`;
+
+    return this.http.delete<any>(url, this.httpOptions)
+      .pipe(
+        catchError(this.errorHandler.handleError)
+      );
+  }
 }
