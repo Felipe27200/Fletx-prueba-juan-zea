@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink} from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
@@ -28,6 +28,7 @@ export class LoginComponent {
   private route: ActivatedRoute = inject(ActivatedRoute)
   private fb: FormBuilder = inject(FormBuilder)
   private authService: AuthService = inject(AuthService)
+  private router: Router = inject(Router);
 
   loginForm = this.fb.group({
     username: ['', Validators.required],
@@ -75,7 +76,9 @@ export class LoginComponent {
     this.authService.login(formData)
       .subscribe({
         next: (response) => {
-          this.authService.setAccessToken(response.data)
+          this.authService.setAccessToken(response.data);
+
+          this.router.navigate(['/products/']);
         },
         error: (e) => {
           if (e.error.hasOwnProperty("errors"))

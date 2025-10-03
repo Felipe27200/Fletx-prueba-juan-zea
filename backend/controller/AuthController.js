@@ -75,7 +75,6 @@ exports.handleRefreshToken = async (req, res) => {
         refreshToken,
         process.env.REFRESH_TOKEN_SECRET,
         (err, decoded) => {
-            console.log(decoded.username, foundUser.username);
             if (err || foundUser.username !== decoded.username) 
                 return res.sendStatus(403);
 
