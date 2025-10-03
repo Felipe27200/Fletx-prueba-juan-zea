@@ -1,51 +1,51 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import { HttpRequest, HttpHandlerFn, HttpEvent, HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
 import { Observable, throwError, switchMap, catchError } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { environment } from '../../environments/environment';
 
-@Injectable()
-export class JwtInterceptor implements HttpInterceptor {
+export const jwtInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
 
-  private authService = inject(AuthService);
-  private router = inject(Router);
+  const skipUrls = [
+    'http://localhost:3000/api/auth/login',
+    'http://localhost:3000/api/auth/signup',
+    'http://localhost:3000/api/auth/refresh-token'
+  ];
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const skipUrls = [
-      `${environment.apiUrl}/api/login`,
-      `${environment.apiUrl}/api/signup`,
-    ];
+  if (skipUrls.includes(req.url)) {
+    return next(req);
+  }
 
-    if (skipUrls.includes(req.url)) {
-      return next.handle(req);
-    }
+  const token = authService.getAccessToken();
 
-    const token = this.authService.getAccessToken();
+  const authReq = req.clone({
+    setHeaders: token ? { Authorization: `Bearer ${token}` } : {},
+    withCredentials: true
+  });
 
-    let authReq = token
-      ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
-      : req;
-
-    return next.handle(authReq).pipe(
-      catchError((error: HttpErrorResponse) => {
-        if (error.status === 401) {
-          // Try to refresh token
-          return this.authService.refreshAccessToken().pipe(
+  return next(authReq).pipe(
+    catchError((error) => {
+      if (error.status === 401) 
+      {
+        return authService.refreshAccessToken()
+          .pipe(
             switchMap(newToken => {
               const newReq = req.clone({
-                setHeaders: { Authorization: `Bearer ${newToken}` }
+                setHeaders: { Authorization: `Bearer ${newToken}` },
+                withCredentials: true
               });
-              return next.handle(newReq);
+              
+              return next(newReq);
             }),
             catchError(() => {
-              this.router.navigate(['/login']);
+              router.navigate(['/login']);
               return throwError(() => error);
             })
           );
         }
-        return throwError(() => error);
-      })
-    );
-  }
-}
+      return throwError(() => error);
+    })
+  );
+};
