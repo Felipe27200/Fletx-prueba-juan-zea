@@ -26,8 +26,25 @@ export class ProductService {
       .pipe(catchError(this.errorHandler.handleError));
   }
 
+  updateProduct(product: any, id: number)
+  {
+    let url = this.baseUrl + "/" + id;
+
+    return this.http.put<any>(url, product, this.httpOptions)
+      .pipe(catchError(this.errorHandler.handleError));
+  }
+
   findAll() {
     let url = `${this.baseUrl}/`;
+
+    return this.http.get<any>(url, this.httpOptions)
+      .pipe(
+        catchError(this.errorHandler.handleError)
+      );
+  }
+
+  findById(id: number) {
+    let url = `${this.baseUrl}/${+id}`;
 
     return this.http.get<any>(url, this.httpOptions)
       .pipe(

@@ -72,6 +72,13 @@
                     <td>{{ product.price }}</td>
                     <td>{{ (product.quantity) }}</td>
                     <td class="text-center">
+                        <p-button 
+                        icon="pi pi-file-edit"
+                        severity="info"
+                        [routerLink]="'/products/' + product.id"
+                        styleClass="h-7 !w-9 !mr-1 !mb-1"
+                        size="small"
+                      />
                     </td>
                 </tr>
             </ng-template>
