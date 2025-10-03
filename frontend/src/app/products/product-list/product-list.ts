@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 
 import { Card } from 'primeng/card';
 import { Toast } from 'primeng/toast';
@@ -27,7 +27,8 @@ import { CommonResponseService } from '../../services/common-response.service';
     InputIconModule,
     InputText,
     Button,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    RouterLink
   ],
   providers: [
     ConfirmationService,
