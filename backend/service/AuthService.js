@@ -84,6 +84,19 @@ exports.findByRefreshToken = async function (refreshToken) {
     return userResponse(user);
 }
 
+exports.logout = async (refreshToken) => {
+    let user = module.exports.findByRefreshToken(refreshToken);
+
+    if (!user)
+        return;
+
+    // Remove the refresh token from the user
+    userModel.update(
+        { refresh_token: '' },
+        { where: { refresh_token: refreshToken } }
+    );
+}
+
 function userResponse(user) {
     return {
         username: user.username,

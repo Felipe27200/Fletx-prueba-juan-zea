@@ -84,6 +84,19 @@ exports.handleRefreshToken = async (req, res) => {
     );
 }
 
+exports.logout = async (req, res) => {
+    const cookies = req.cookies;
+
+    if (!cookies?.jwt) 
+        return res.sendStatus(204); //No content
+
+    const refreshToken = cookies.jwt;
+
+    authService.logout(refreshToken);
+
+    res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
+    res.sendStatus(204);
+}
 
 function responseObjet(message, data, status = 'successful')
 {
