@@ -1,0 +1,94 @@
+@if (messageSignup !== undefined && messageSignup !== null && messageSignup !== '')
+{
+  <div class="flex justify-center">
+    <div class="w-full max-w-lg mt-6">
+      <div class="w-full rounded-xl shadow-md">
+        <p-message 
+          severity="success" 
+          closable 
+          styleClass="w-full"
+          class="!w-full"
+        >
+          {{ messageSignup }}
+        </p-message>
+      </div>
+    </div>
+  </div>
+}
+
+<div class="flex justify-center">
+  <p-card class="w-full max-w-lg mt-8 !bg-gray-800 rounded-xl shadow-lg">
+    
+    <ng-template pTemplate="header">
+      <div class="text-center mt-6 text-3xl font-bold text-white">
+        Sign-Up
+        <span class="pi pi-calculator text-2xl"></span>
+      </div>
+    </ng-template>
+    
+    <ng-template pTemplate="content">
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="mt-6 space-y-5">
+        
+        <!-- Name -->
+        <div>
+          <label for="name" class="block text-white">Name:</label>
+          <input 
+            id="name"
+            formControlName="name"
+            type="text" 
+            pInputText
+            class="mt-2 w-full rounded-md border border-gray-600 bg-gray-900 p-2 text-white placeholder-gray-400 focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
+          >
+        </div>
+
+        <!-- Username -->
+        <div>
+          <label for="username" class="block text-white">Username:</label>
+          <input 
+            id="username"
+            formControlName="username"
+            type="text" 
+            pInputText
+            class="mt-2 w-full rounded-md border border-gray-600 bg-gray-900 p-2 text-white placeholder-gray-400 focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
+          >
+        </div>
+        
+        <!-- Password -->
+        <div [class]="(errors.length > 0) ? 'mb-3' : 'mb-6'">
+          <label for="password" class="block text-white">Password:</label>
+          <input 
+            id="password"
+            formControlName="password"
+            type="password" 
+            pInputText
+            class="mt-2 w-full rounded-md border border-gray-600 bg-gray-900 p-2 text-white placeholder-gray-400 focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
+          >
+          
+          @for (error of errors; track error) {
+            <p class="mt-1 text-sm text-red-500 font-semibold">* {{ error }}</p>
+          }
+        </div>
+        
+        <!-- Buttons -->
+        <div class="text-center space-y-3">
+          <p-button 
+            type="submit" 
+            label="Sign-Up" 
+            styleClass="w-full bg-sky-700 hover:bg-sky-600 font-semibold text-white mb-3" 
+            size="small"
+            [disabled]="!loginForm.valid"
+          ></p-button>
+          
+          <p-button 
+            label="Back to Login" 
+            styleClass="w-full bg-gray-600 hover:bg-gray-500 font-semibold text-white" 
+            size="small"
+            routerLink="/login"
+          ></p-button>
+        </div>
+        
+      </form>
+    </ng-template>
+    
+  </p-card>
+</div>
