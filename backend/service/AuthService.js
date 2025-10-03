@@ -1,6 +1,6 @@
 const userModel = require('../model/User');
 const bcrypt = require('bcrypt')
-const JWT = require('jsonwebtoken')
+const jwt = require('jsonwebtoken')
 
 exports.register = async function (userDTO) {
     let checkDuplicateUser = await module.exports.findByUsername(userDTO.username);
@@ -35,13 +35,13 @@ exports.login = async function (username, password) {
     }
 
     // CREATE JWT
-    const accessToken = JWT.sign(
+    const accessToken = jwt.sign(
         { "username": user.username },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: '30s' }
+        { expiresIn: '15m' }
     );
 
-    const refreshToken = JWT.sign(
+    const refreshToken = jwt.sign(
         { "username": user.username },
         process.env.REFRESH_TOKEN_SECRET,
         { expiresIn: '1d' }
@@ -52,7 +52,7 @@ exports.login = async function (username, password) {
         { refresh_token: refreshToken }, 
         { where: { id: user.id } });
 
-    return refreshToken;
+    return { accessToken, refreshToken };
 };
 
 async function encryptPassword(password) {

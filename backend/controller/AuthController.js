@@ -1,6 +1,6 @@
 const authService = require('../service/AuthService');
 const CreateUserDTO = require('../dto/CreateUserDTO')
-const JWT = require('jsonwebtoken')
+const jwt = require('jsonwebtoken')
 
 exports.register = async function (req, res) {
     try
@@ -37,10 +37,10 @@ exports.login = async function (req, res) {
         if (!req.body.password || req.body.password.trim().length <= 0)
             throw new Error("The password is required");
 
-        let refreshToken = await authService.login(req.body.username, req.body.password);
+        let tokens = await authService.login(req.body.username, req.body.password);
 
-        res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 25 * 60 * 60 * 1000 });
-        res.json(responseObjet("User login", refreshToken));
+        res.cookie('jwt', tokens.refreshToken, { httpOnly: true, sameSite: 'None', secure:true, maxAge: 25 * 60 * 60 * 1000 });
+        res.json(responseObjet("User login", tokens.accessToken));
     }
     catch(error)
     {
@@ -49,7 +49,7 @@ exports.login = async function (req, res) {
     }
 }
 
-exports.handleRefreshToken = (req, res) => {
+exports.handleRefreshToken = async (req, res) => {
     const cookies = req.cookies;
 
     if (!cookies?.jwt) 
@@ -57,16 +57,17 @@ exports.handleRefreshToken = (req, res) => {
     
     const refreshToken = cookies.jwt;
 
-    const foundUser = authService.findByRefreshToken(refreshToken);
+    const foundUser = await authService.findByRefreshToken(refreshToken);
 
     if (!foundUser) 
         return res.sendStatus(403); //Forbidden 
 
     // evaluate jwt 
-    JWT.verify(
+    jwt.verify(
         refreshToken,
         process.env.REFRESH_TOKEN_SECRET,
         (err, decoded) => {
+            console.log(decoded.username, foundUser.username);
             if (err || foundUser.username !== decoded.username) 
                 return res.sendStatus(403);
 
@@ -75,7 +76,7 @@ exports.handleRefreshToken = (req, res) => {
             const accessToken = jwt.sign(
                 { "username": decoded.username },
                 process.env.ACCESS_TOKEN_SECRET,
-                { expiresIn: '30s' }
+                { expiresIn: '15m' }
             );
 
             res.json({ accessToken })

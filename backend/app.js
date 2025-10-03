@@ -17,7 +17,7 @@ app.use("/api/auth", authRoutes);
 app.use(verifyJWT);
 
 app.get('/ok', (req, res) => {
-  res.send('Hello World!')
+  res.json('Hello World!')
 })
 
 // Error Handler
