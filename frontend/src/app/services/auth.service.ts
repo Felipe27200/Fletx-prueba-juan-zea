@@ -43,13 +43,20 @@ export class AuthService {
 
   refreshAccessToken(): Observable<string> {
     return this.http.get<{ accessToken: string }>(
-      `${environment.apiUrl}/api/auth/refresh-token`,
+      `${this.baseUrl}/refresh-token`,
       { withCredentials: true }
     ).pipe(
       tap(res => this.accessToken = res.accessToken),
       // map to return only token
       map(res => res.accessToken)
     );
+  }
+
+  logout() {
+    return this.http.get<any>(
+      `${this.baseUrl}/logout`,
+      { withCredentials: true }
+    ).pipe(catchError(this.errorHandler.handleError));
   }
   
   setAccessToken(accessToken: string) {
