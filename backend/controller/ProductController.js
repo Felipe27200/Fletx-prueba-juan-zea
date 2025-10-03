@@ -40,10 +40,7 @@ exports.findById = async function (req, res) {
     try {
         let id = req.params.id;
 
-        if (isNaN(id))
-            throw new Error("The product ID must be a number");
-        if (id <= 0)
-            throw new Error("The product ID must be greater than zero");
+        validateId(id);
 
         let product = await productService.findById(id);
 
@@ -53,6 +50,42 @@ exports.findById = async function (req, res) {
         res.status(400);
         res.json(responseUtils.responseObject(error.message, error, 'unsuccessful'));
     }
+}
+
+exports.findAll = async function (req, res) {
+    try {
+        let products = await productService.findAll();
+
+        res.json(responseUtils.responseObject('Product Found', products));
+    }
+    catch (error) {
+        res.status(400);
+        res.json(responseUtils.responseObject(error.message, error, 'unsuccessful'));
+    }
+}
+
+exports.deleteById = async function (req, res) {
+    try {
+        let id = req.params.id;
+
+        validateId(id);
+
+        let product = await productService.deleteById(id);
+
+        res.json(responseUtils.responseObject('Product deleted', product));
+    }
+    catch (error) {
+        res.status(400);
+        res.json(responseUtils.responseObject(error.message, error, 'unsuccessful'));
+    }
+}
+
+function validateId(id)
+{
+    if (isNaN(id))
+        throw new Error("The product ID must be a number");
+    if (id <= 0)
+        throw new Error("The product ID must be greater than zero");
 }
 
 function validateProduct(req) {

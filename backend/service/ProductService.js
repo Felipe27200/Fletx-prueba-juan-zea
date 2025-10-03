@@ -47,6 +47,12 @@ exports.findByName = async function (name) {
     return product;
 }
 
+exports.findAll = async function () {
+    let products = await productModel.findAll();
+
+    return products;
+}
+
 exports.findById = async function (id) {
     if (isNaN(id))
         throw new Error("The product ID must be a number");
@@ -59,10 +65,20 @@ exports.findById = async function (id) {
         }
     });
 
-    console.log(product)
-
     if (!product)
         throw new Error(`Product with ID ${id} not found`);
 
     return product;
+}
+
+exports.deleteById = async function (id) {
+    let product = await module.exports.findById(id);
+
+    console.log(product);
+
+    await productModel.destroy({
+        where: { id: product.id }
+    });
+
+    return `The product: '${product.name}' was deleted`;
 }
