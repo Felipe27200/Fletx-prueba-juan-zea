@@ -73,7 +73,11 @@ export class LoginComponent {
     this.authService.login(formData)
       .subscribe({
         next: (response) => {
-          console.log(response);2
+          console.log(response);
+
+          this.authService.setAccessToken(response.data)
+
+          console.log(this.authService.getAccessToken())
         },
         error: (e) => {
           if (e.error.hasOwnProperty("errors"))

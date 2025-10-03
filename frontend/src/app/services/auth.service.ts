@@ -10,6 +10,7 @@ import { catchError } from 'rxjs';
 })
 export class AuthService {
   private baseUrl = environment.apiUrl + "/api/auth";
+  private accessToken: string | null = null;
 
   private http: HttpClient = inject(HttpClient);
   private errorHandler: ErrorHandlerService = inject(ErrorHandlerService);
@@ -30,4 +31,13 @@ export class AuthService {
       );
   }
 
+  setAccessToken(accessToken: string)
+  {
+    this.accessToken = accessToken;
+  }
+
+  getAccessToken(): string | null
+  {
+    return this.accessToken;
+  }
 }
